@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # main.py
 # Terminal entry point for the RAG pipeline.
 # Run this file to ingest documents and ask questions via the terminal.
@@ -154,6 +155,12 @@ def main():
     if args.query:
         query(args.query)
 
+=======
+from ingestion.file_router import route_file
+
+def main():
+    print("RAG Pipeline Starting")
+>>>>>>> 6b0c89a0fb9f01e94c17060d4bba11921568d2b8
 
 if __name__ == "__main__":
     main()

@@ -1,0 +1,11 @@
+langchain
+langchain-community
+chromadb
+sentence-transformers
+streamlit
+pymupdf
+pdfplumber
+google-generativeai
+python-dotenv
+pandas
+numpy
