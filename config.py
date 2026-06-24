@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # config.py
 # Central configuration file for the RAG pipeline.
 # All shared settings live here. Never hardcode these values in other files.
@@ -122,17 +121,4 @@ Question:
 
 Answer:
 """
-=======
-# Chunking Configuration
-CHUNK_SIZE = 500
-CHUNK_OVERLAP = 50
 
-# Embedding Model
-EMBEDDING_MODEL = "BAAI/bge-large-en-v1.5"
-
-# Vector Database
-VECTOR_DB_PATH = "./data/chroma_db"
-
-# Retrieval
-TOP_K = 5
->>>>>>> 6b0c89a0fb9f01e94c17060d4bba11921568d2b8
