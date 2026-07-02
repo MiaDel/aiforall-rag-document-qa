@@ -1,14 +1,14 @@
 import fitz
 import pdfplumber
 from pathlib import Path
-from utils.models import ParsedPage
-from utils.exceptions import FileValidationError
-from utils.exceptions import PDFParserError
+from llm.models import ParsedPage
+from exceptions import FileValidationError
+from exceptions import PDFParserError
 from typing import List
 from PIL import ImageOps
 import pytesseract
 from pdf2image import convert_from_path
-from utils.logger import logger
+from observability.logger import logger
 
 pytesseract.pytesseract.tesseract_cmd = (
     r"C:\Program Files\Tesseract-OCR\tesseract.exe"
