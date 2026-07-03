@@ -1,11 +1,12 @@
 langchain
 langchain-community
+langchain-chroma
 chromadb
 sentence-transformers
-streamlit
 pymupdf
-pdfplumber
+streamlit
 google-generativeai
 python-dotenv
+rank-bm25
 pandas
 numpy
