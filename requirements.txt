@@ -1,0 +1,18 @@
+# Core Python Package Dependencies for Multi-Document RAG Chatbot
+# Recommended runtime environment: Python 3.11.x
+
+streamlit>=1.30.0,<1.40.0
+chromadb>=0.4.24,<0.5.0
+langchain>=0.1.0,<0.2.0
+langchain-core>=0.1.0,<0.2.0
+langgraph>=0.0.26,<0.1.0
+sentence-transformers>=2.5.0,<3.0.0
+torch>=2.2.0,<2.3.0
+google-genai>=0.1.0,<0.2.0
+openai>=1.12.0,<2.0.0
+pydantic>=2.5.0,<3.0.0
+python-dotenv>=1.0.0,<2.0.0
+requests>=2.31.0,<3.0.0
+numpy>=1.24.0,<2.0.0
+psutil>=5.9.0,<6.0.0
+docx2txt>=0.8

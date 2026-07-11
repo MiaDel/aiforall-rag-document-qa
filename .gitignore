@@ -1,0 +1,19 @@
+__pycache__/
+*.pyc
+.env
+.venv/
+venv/
+models/
+embeddings/
+vectorstore/
+logs/
+# Generated database
+data/chroma_db/
+
+# Uploaded documents
+data/uploads/
+
+# Cache
+*.db
+*.sqlite3
+*.bin

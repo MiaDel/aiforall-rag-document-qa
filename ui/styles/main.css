@@ -1,0 +1,199 @@
+/* Modern Inter Font Import */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Global Style Overrides */
+html, body, [data-testid="stAppViewContainer"] {
+    font-family: 'Inter', sans-serif !important;
+    background-color: #F8F9FD !important;
+}
+
+/* Sidebar Custom Styling */
+[data-testid="stSidebar"] {
+    background-color: #FFFFFF !important;
+    border-right: 1px solid #E4E7EC !important;
+}
+
+/* Hide standard Streamlit header elements for a clean dashboard appearance */
+header {
+    background: rgba(0, 0, 0, 0) !important;
+}
+
+/* Custom Navigation Button styling */
+.nav-btn {
+    display: flex;
+    align-items: center;
+    padding: 10px 16px;
+    border-radius: 8px;
+    margin-bottom: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+.nav-btn-active {
+    background-color: #EEF2F6 !important;
+    color: #4F46E5 !important;
+}
+.nav-btn:hover {
+    background-color: #F3F4F6;
+}
+
+/* Card base styling */
+.dashboard-card {
+    background-color: #FFFFFF;
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid #EEF2F6;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.02);
+    margin-bottom: 16px;
+}
+
+/* Top Metric Cards Custom Layout */
+.metric-container {
+    display: flex;
+    align-items: center;
+    background-color: #FFFFFF;
+    border-radius: 16px;
+    padding: 20px;
+    border: 1px solid #EEF2F6;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+}
+.metric-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 16px;
+}
+.icon-blue { background-color: #EFF6FF; color: #3B82F6; }
+.icon-green { background-color: #ECFDF5; color: #10B981; }
+.icon-purple { background-color: #F5F3FF; color: #8B5CF6; }
+
+.metric-label {
+    font-size: 12px;
+    color: #6B7280;
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+.metric-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 2px;
+}
+.metric-sub {
+    font-size: 11px;
+    font-weight: 500;
+}
+.sub-blue { color: #3B82F6; }
+.sub-green { color: #10B981; }
+.sub-purple { color: #8B5CF6; }
+
+/* Status Indicators */
+.status-badge {
+    background-color: #EBFDF5;
+    color: #10B981;
+    border: 1px solid #A7F3D0;
+    border-radius: 9999px;
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+}
+
+/* Source Panel Cards */
+.source-card {
+    background-color: #FFFFFF;
+    border-radius: 12px;
+    padding: 12px 16px;
+    border: 1px solid #EEF2F6;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.source-info {
+    display: flex;
+    align-items: center;
+}
+.pdf-icon {
+    font-size: 24px;
+    margin-right: 12px;
+    color: #EF4444;
+}
+.source-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #111827;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 180px;
+}
+.source-meta {
+    font-size: 11px;
+    color: #6B7280;
+    margin-top: 2px;
+}
+.source-badge {
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+}
+.badge-green { background-color: #ECFDF5; color: #10B981; }
+.badge-orange { background-color: #FFF7ED; color: #F97316; }
+
+/* Sidebar status widget */
+.sidebar-status-box {
+    background-color: #F9FAFB;
+    border-radius: 12px;
+    padding: 16px;
+    border: 1px solid #F3F4F6;
+    margin-top: 24px;
+}
+.status-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    margin-bottom: 8px;
+    color: #4B5563;
+}
+.status-item-label {
+    font-weight: 500;
+}
+.status-item-value {
+    font-weight: 600;
+    color: #111827;
+}
+
+/* Chat Bubbles custom design */
+.chat-bubble-assistant {
+    background-color: #EEF2F6 !important;
+    border-radius: 16px;
+    padding: 14px 18px;
+    color: #1F2937;
+    margin-bottom: 12px;
+    border-top-left-radius: 4px;
+    max-width: 85%;
+}
+.chat-bubble-user {
+    background-color: #EEF2F6 !important;
+    border-radius: 16px;
+    padding: 14px 18px;
+    color: #1F2937;
+    margin-bottom: 12px;
+    border-top-right-radius: 4px;
+    max-width: 85%;
+    margin-left: auto;
+}
+.timestamp {
+    font-size: 10px;
+    color: #9CA3AF;
+    margin-top: 4px;
+    text-align: right;
+}
