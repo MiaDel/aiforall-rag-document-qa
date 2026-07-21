@@ -2,7 +2,7 @@
 =========================================================
 File Name : app.py
 Project   : Multi-Document RAG Chatbot
-Author    : Kaif Rehman
+Author    : Kaif Rehman, Mia Delhalle
 Description:
 Streamlit application main entry point. Coordinates multi-page
 view dispatchers, configures global loggers, checks runtime
@@ -27,6 +27,12 @@ from ui.pages.upload import run_upload_page
 from ui.pages.document_viewer import run_document_viewer_page
 from ui.pages.ask_explore import run_ask_explore_page
 from ui.pages.settings import run_settings_page
+from utils.resource_manager import get_chroma_manager
+
+st.set_page_config(page_title="RAG Assistant", layout="wide")
+
+# Triggers auto-build on first run; cached after that
+chroma_manager = get_chroma_manager()
 
 # Centralized logging configuration
 logging.basicConfig(

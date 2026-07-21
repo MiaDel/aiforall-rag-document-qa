@@ -4,15 +4,16 @@ __pycache__/
 .venv/
 venv/
 models/
-embeddings/
-vectorstore/
 logs/
 # Generated database
 data/chroma_db/
 
+# Intermediate pipelines output
+data/processed/
+
 # Uploaded documents
 data/uploads/
-data/processed/
+
 
 # Cache
 *.db
