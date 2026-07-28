@@ -6,11 +6,13 @@ Author    : Kaif Rehman
 Description:
 Configuration module for loading and validating system environment variables.
 Applies environment setup rules for HuggingFace caching, telemetry,
-and offline execution switches.
+and offline execution switches. Integrates Streamlit Secrets checks
+falling back to local environment variables or defaults.
 
 Technologies:
 - Python standard os/pathlib libraries
 - python-dotenv
+- Streamlit secrets interface
 =========================================================
 """
 
@@ -55,6 +57,19 @@ PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
 CHROMA_PERSIST_DIR.mkdir(parents=True, exist_ok=True)
 
 
+def get_secret_or_env(key: str, default: str = "") -> str:
+    """Helper to retrieve configuration value.
+    First checks Streamlit secrets, then checks environment variables/defaults.
+    """
+    try:
+        import streamlit as st
+        if hasattr(st, "secrets") and key in st.secrets:
+            return str(st.secrets[key])
+    except Exception:
+        pass
+    return os.getenv(key, default)
+
+
 class Settings:
     """Application configurations. Loads values from environment variables or applies defaults.
 
@@ -65,30 +80,30 @@ class Settings:
     4. Maintain api key credentials.
     """
     # System settings
-    LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
-    CHROMA_PERSIST_DIRECTORY: str = os.getenv("CHROMA_PERSIST_DIRECTORY", str(CHROMA_PERSIST_DIR.resolve()))
-    COLLECTION_NAME: str = os.getenv("COLLECTION_NAME", "loan_documents")
+    LOG_LEVEL: str = get_secret_or_env("LOG_LEVEL", "INFO")
+    CHROMA_PERSIST_DIRECTORY: str = get_secret_or_env("CHROMA_PERSIST_DIRECTORY", str(CHROMA_PERSIST_DIR.resolve()))
+    COLLECTION_NAME: str = get_secret_or_env("COLLECTION_NAME", "loan_documents")
 
     # Ingestion & Chunking
-    CHUNK_SIZE: int = int(os.getenv("CHUNK_SIZE", 1000))
-    CHUNK_OVERLAP: int = int(os.getenv("CHUNK_OVERLAP", 200))
+    CHUNK_SIZE: int = int(get_secret_or_env("CHUNK_SIZE", "1000"))
+    CHUNK_OVERLAP: int = int(get_secret_or_env("CHUNK_OVERLAP", "200"))
 
     # Retrieval parameters
-    TOP_K: int = int(os.getenv("TOP_K", 5))
-    SIMILARITY_THRESHOLD: float = float(os.getenv("SIMILARITY_THRESHOLD", 0.3))
+    TOP_K: int = int(get_secret_or_env("TOP_K", "5"))
+    SIMILARITY_THRESHOLD: float = float(get_secret_or_env("SIMILARITY_THRESHOLD", "0.3"))
 
     # Embeddings & Reranking models
-    EMBEDDING_MODEL_NAME: str = os.getenv("EMBEDDING_MODEL_NAME", "BAAI/bge-large-en-v1.5")
-    RERANKER_MODEL_NAME: str = os.getenv("RERANKER_MODEL_NAME", "cross-encoder/ms-marco-MiniLM-L-6-v2")
+    EMBEDDING_MODEL_NAME: str = get_secret_or_env("EMBEDDING_MODEL_NAME", "BAAI/bge-large-en-v1.5")
+    RERANKER_MODEL_NAME: str = get_secret_or_env("RERANKER_MODEL_NAME", "cross-encoder/ms-marco-MiniLM-L-6-v2")
 
     # LLM Provider settings
-    OLLAMA_HOST: str = os.getenv("OLLAMA_HOST", "http://127.0.0.1:11434")
-    OLLAMA_MODEL: str = os.getenv("OLLAMA_MODEL", "llama3")
-    GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
-    GROQ_API_KEY: str = os.getenv("GROQ_API_KEY", "")
-    GROQ_MODEL: str = os.getenv("GROQ_MODEL", "llama3-70b-8192")
-    OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
-    OPENAI_MODEL: str = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+    OLLAMA_HOST: str = get_secret_or_env("OLLAMA_HOST", "http://127.0.0.1:11434")
+    OLLAMA_MODEL: str = get_secret_or_env("OLLAMA_MODEL", "llama3")
+    GEMINI_API_KEY: str = get_secret_or_env("GEMINI_API_KEY", "")
+    GROQ_API_KEY: str = get_secret_or_env("GROQ_API_KEY", "")
+    GROQ_MODEL: str = get_secret_or_env("GROQ_MODEL", "llama3-70b-8192")
+    OPENAI_API_KEY: str = get_secret_or_env("OPENAI_API_KEY", "")
+    OPENAI_MODEL: str = get_secret_or_env("OPENAI_MODEL", "gpt-4o-mini")
 
 
 # Singleton configuration object
