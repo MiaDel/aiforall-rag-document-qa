@@ -17,9 +17,9 @@ huggingface-hub==0.24.5
 
 chromadb==0.4.24
 
-langchain==0.1.20
-langchain-core==0.1.52
-langchain-community==0.0.38
+langchain
+langchain-core
+langchain-community
 langgraph==0.0.55
 
 pydantic==2.8.2
@@ -32,7 +32,7 @@ python-docx==1.1.2
 
 networkx==3.3
 
-google-genai==0.1.1
+google-genai
 groq==0.9.0
 openai==1.40.6
 ollama==0.3.1
