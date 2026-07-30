@@ -18,7 +18,13 @@ import sys
 import logging
 import streamlit as st
 from pathlib import Path
+
+
+
 from config.settings import settings
+
+
+
 from ui.components.sidebar import render_sidebar
 
 # Page Specific Views
@@ -28,7 +34,15 @@ from ui.pages.document_viewer import run_document_viewer_page
 from ui.pages.settings import run_settings_page
 from utils.resource_manager import get_chroma_manager
 
-st.set_page_config(page_title="RAG Assistant", layout="wide")
+# Page Configuration
+st.set_page_config(
+    page_title="Multi-Document RAG Chatbot",
+    page_icon="💼",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+# st.set_page_config(page_title="RAG Assistant", layout="wide")
+
 
 # Triggers auto-build on first run; cached after that
 chroma_manager = get_chroma_manager()
@@ -40,13 +54,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger("app")
 
-# Page Configuration
-st.set_page_config(
-    page_title="Multi-Document RAG Chatbot",
-    page_icon="💼",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
 
 # Startup validation check: warning if Python > 3.11
 # if sys.version_info.major > 3 or (sys.version_info.major == 3 and sys.version_info.minor > 11):

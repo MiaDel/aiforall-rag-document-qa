@@ -15,7 +15,8 @@ transformers==4.43.3
 sentence-transformers==3.0.1
 huggingface-hub==0.24.5
 
-chromadb==0.4.24
+# chromadb==0.4.24
+chromadb==1.5.9
 
 langchain
 langchain-core
@@ -38,3 +39,5 @@ openai==1.40.6
 ollama==0.3.1
 
 tiktoken==0.7.0
+
+rank_bm25==0.2.2
