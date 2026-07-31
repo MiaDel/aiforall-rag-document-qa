@@ -153,10 +153,10 @@ class LLMRouter:
 
         # 5. Priority Fallback Chain Execution
         routing_chain = [
+            ("openai", self.openai_provider),
             ("llama3", self.llama_provider),
             ("gemini", self.gemini_provider),
-            ("groq", self.groq_provider),
-            ("openai", self.openai_provider)
+            ("groq", self.groq_provider)
         ]
 
         llm_response = None
