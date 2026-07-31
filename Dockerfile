@@ -10,10 +10,14 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Pre-download the HuggingFace embedding model into the container cache
-RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('BAAI/bge-large-en-v1.5')"
+# Download the model directly into an explicit local folder within /app
+RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('BAAI/bge-large-en-v1.5').save('/app/bge-large-en-v1.5')"
 
 COPY . .
+
+# Force HuggingFace to run in offline mode using the pre-downloaded local model
+ENV HF_HUB_OFFLINE=1
+ENV TRANSFORMERS_OFFLINE=1
 
 EXPOSE 8501
 

@@ -55,37 +55,71 @@ class BGEEmbedder:
 
     def __init__(self) -> None:
         """
-        Initializes the model on CPU or GPU device.
-
-        Workflow:
-        1. Gating check if already initialized.
-        2. Set GPU/CPU device based on CUDA availability.
-        3. Load SentenceTransformer from models directory.
-
-        Parameters:
-            None
-
-        Returns:
-            None
-
-        Raises:
-            RuntimeError: If model weights fail to load.
+        Initializes the model on CPU or GPU device using local fallback paths.
         """
         if self._initialized:
             return
 
-        self.model_name: str = settings.EMBEDDING_MODEL_NAME
+        import os
+        from pathlib import Path
+
+        # Check if model was pre-saved to /app/models during Docker build
+        local_model_dir = Path("./models").resolve()
+        if local_model_dir.exists() and any(local_model_dir.iterdir()):
+            self.model_name: str = str(local_model_dir)
+            logger.info(f"Found pre-downloaded local model at '{self.model_name}'")
+        else:
+            self.model_name: str = settings.EMBEDDING_MODEL_NAME
+
         # Automatically detect device
         self.device: str = "cuda" if torch.cuda.is_available() else "cpu"
         logger.info(f"Loading embedding model '{self.model_name}' on device '{self.device}'...")
         
         try:
-            self.model: SentenceTransformer = SentenceTransformer(self.model_name, device=self.device, cache_folder="./models")
+            # Load model directly from local directory if present
+            self.model: SentenceTransformer = SentenceTransformer(
+                self.model_name, 
+                device=self.device
+            )
             logger.info("Embedding model loaded successfully.")
             self._initialized = True
         except Exception as e:
             logger.exception(f"Failed to load sentence transformer model '{self.model_name}': {str(e)}")
             raise RuntimeError(f"Embedding model initialization failed: {str(e)}") from e
+
+    # def __init__(self) -> None:
+    #     """
+    #     Initializes the model on CPU or GPU device.
+
+    #     Workflow:
+    #     1. Gating check if already initialized.
+    #     2. Set GPU/CPU device based on CUDA availability.
+    #     3. Load SentenceTransformer from models directory.
+
+    #     Parameters:
+    #         None
+
+    #     Returns:
+    #         None
+
+    #     Raises:
+    #         RuntimeError: If model weights fail to load.
+    #     """
+    #     if self._initialized:
+    #         return
+
+    #     self.model_name: str = settings.EMBEDDING_MODEL_NAME
+    #     # Automatically detect device
+    #     self.device: str = "cuda" if torch.cuda.is_available() else "cpu"
+    #     logger.info(f"Loading embedding model '{self.model_name}' on device '{self.device}'...")
+        
+    #     try:
+    #         self.model: SentenceTransformer = SentenceTransformer(self.model_name, device=self.device, cache_folder="./models")
+    #         logger.info("Embedding model loaded successfully.")
+    #         self._initialized = True
+    #     except Exception as e:
+    #         logger.exception(f"Failed to load sentence transformer model '{self.model_name}': {str(e)}")
+    #         raise RuntimeError(f"Embedding model initialization failed: {str(e)}") from e
 
     def embed_documents(self, texts: List[str]) -> List[List[float]]:
         """
