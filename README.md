@@ -167,12 +167,3 @@ To migrate from the experimental Python 3.14 environment to the stable productio
 *   **Bulk Document Insertion**: Changed iterative adds in Chroma to a single `collection.add(...)` vector array insert, dropping chunk storage latencies.
 *   **Session Caching**: Singletons (`ChromaManager`, `BGEEmbedder`, `CrossEncoderReranker`) are registered in Streamlit `@st.cache_resource` memory to guarantee instantiation runs once.
 
-### Before vs. After Benchmark
-
-| Operation | Before Optimization | After Optimization | Improvement Factor |
-| :--- | :--- | :--- | :--- |
-| **App Startup Time** | 30 - 45s | 1.1s | **~35x faster** |
-| **Subsequent Page Reruns** | 5 - 10s | 0.8s | **~10x faster** |
-| **PDF Ingestion & Embed (50 pages)**| 65s | 4.8s | **~13x faster** |
-| **ChromaDB Chunk Inserts** | 12s | 0.12s | **~100x faster** |
-| **Model Weight Reloads** | On every click | Loaded once | **Infinite** |
