@@ -4,7 +4,86 @@ A high-performance, production-grade Retrieval-Augmented Generation (RAG) system
 
 ---
 
-## 1. Folder Structure
+## 1. Setup Instructions
+
+1.  **System Requirements**:
+    *   Python 3.11.x is recommended for optimal library stability.
+    *   Local Ollama installation (if running local LLM).
+
+2.  **Clone and Navigate**:
+    ```powershell
+    cd "c:/Users/username/Projects/Loan RAG chatbot"
+    ```
+
+3.  **Create and Activate Virtual Environment**:
+    ```powershell
+    py -3.11 -m venv venv
+    .\venv\Scripts\Activate.ps1
+    ```
+
+4.  **Install Pinned Dependencies**:
+    ```powershell
+    pip install -r requirements.txt
+    ```
+
+5.  **Configure Credentials**:
+    Copy `.env.example` to `.env` and fill in API keys:
+    ```powershell
+    Copy-Item .env.example .env
+    ```
+
+6.  **Download the Embedding Model (one-time, requires internet)**:
+    See [Section 2: First-Time Setup — Embedding Model Cache](#2-first-time-setup-embedding-model-cache) below. This step is required before the app will run, even if you already have the model cached elsewhere on your machine — the app expects it in a specific project-local folder.
+
+7.  **Pull Local Model**:
+    Verify Ollama is running and fetch Llama3:
+    ```powershell
+    ollama pull llama3
+    ```
+
+8.  **Launch Dashboard**:
+    ```powershell
+    streamlit run app.py
+    ```
+
+---
+
+## 2. First-Time Setup: Embedding Model Cache
+
+This project uses a local embedding model (`BAAI/bge-large-en-v1.5`) that must be downloaded once per machine before running the app. This is a one-time step after cloning the repo, separate from `pip install`.
+
+### Why this is needed
+The app runs with Hugging Face's offline mode enabled (`HF_HUB_OFFLINE=1`) so it never makes network calls at runtime. That means the model files must already exist locally in the exact folder the app expects — cloning the repo does **not** include the model weights (they're git-ignored due to size, ~1.3GB).
+
+### Setup steps
+
+1. Make sure you've completed steps 1–5 above (venv created, dependencies installed).
+
+2. Run this **one-time download command** (requires internet access), from the project root:
+   ```bash
+   python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('BAAI/bge-large-en-v1.5', cache_folder='./models')"
+   ```
+   This downloads the model into `./models`, matching the exact cache path the app reads from at runtime. The `cache_folder='./models'` argument is required — a plain download without it will not be found by the app.
+
+3. Verify the download succeeded:
+   ```powershell
+   # Windows PowerShell
+   Get-ChildItem .\models -Recurse -Filter "config.json"
+   ```
+   ```bash
+   # macOS/Linux
+   find ./models -name "config.json"
+   ```
+   You should see `config.json` under `models/models--BAAI--bge-large-en-v1.5/snapshots/.../`.
+
+4. Continue to step 7 (Pull Local Model) in Section 1.
+
+### Troubleshooting
+If you see an error like `couldn't connect to 'https://huggingface.co'` when starting the app, it almost always means step 2 was skipped, run without the correct `cache_folder` argument, or run in a different directory than the project root. Re-run step 2 exactly as written above from the project root.
+
+---
+
+## 3. Folder Structure
 
 ```text
 ├── app.py                     # Streamlit Main Coordinator & Layout Router
@@ -67,48 +146,7 @@ A high-performance, production-grade Retrieval-Augmented Generation (RAG) system
 
 ---
 
-## 2. Setup Instructions
-
-1.  **System Requirements**:
-    *   Python 3.11.x is recommended for optimal library stability.
-    *   Local Ollama installation (if running local LLM).
-
-2.  **Clone and Navigate**:
-    ```powershell
-    cd "c:/Users/kaifr/Music/Loan RAG chatbot"
-    ```
-
-3.  **Create and Activate Virtual Environment**:
-    ```powershell
-    python -m venv venv
-    .\venv\Scripts\Activate.ps1
-    ```
-
-4.  **Install Pinned Dependencies**:
-    ```powershell
-    pip install -r requirements.txt
-    ```
-
-5.  **Configure Credentials**:
-    Copy `.env.example` to `.env` and fill in API keys:
-    ```powershell
-    Copy-Item .env.example .env
-    ```
-
-6.  **Pull Local Model**:
-    Verify Ollama is running and fetch Llama3:
-    ```powershell
-    ollama pull llama3
-    ```
-
-7.  **Launch Dashboard**:
-    ```powershell
-    streamlit run app.py
-    ```
-
----
-
-## 3. Migration Guide (Python 3.14 to 3.11)
+## 4. Migration Guide (Python 3.14 to 3.11)
 
 To migrate from the experimental Python 3.14 environment to the stable production Python 3.11 build:
 1.  **Deactivate active environments** (`deactivate`).
@@ -122,7 +160,7 @@ To migrate from the experimental Python 3.14 environment to the stable productio
 
 ---
 
-## 4. Performance & Optimization Report
+## 5. Performance & Optimization Report
 
 ### Key Tuning Operations
 *   **Offline Mode Enforcement**: Setting `TRANSFORMERS_OFFLINE=1` when hub caches exist limits startup network roundtrips, reducing loading delays from 30 seconds to **1 second**.
