@@ -7,15 +7,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 
+# 1. Install dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Download the model directly into an explicit local folder within /app
-RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('BAAI/bge-large-en-v1.5').save('/app/bge-large-en-v1.5')"
-
+# 2. Copy your local project code FIRST
 COPY . .
 
-# Force HuggingFace to run in offline mode using the pre-downloaded local model
+# 3. Pre-download the model AFTER copying code (so it doesn't get overwritten)
+RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('BAAI/bge-large-en-v1.5').save('/app/models')"
+
+# 4. Force HuggingFace offline mode
 ENV HF_HUB_OFFLINE=1
 ENV TRANSFORMERS_OFFLINE=1
 
