@@ -64,19 +64,24 @@ class BGEEmbedder:
         from pathlib import Path
 
         # Check if model was pre-saved to /app/models during Docker build
-        local_model_dir = Path("./models").resolve()
-        if local_model_dir.exists() and any(local_model_dir.iterdir()):
-            self.model_name: str = str(local_model_dir)
-            logger.info(f"Found pre-downloaded local model at '{self.model_name}'")
+        local_model_dir = Path("/app/models").resolve()
+        if not local_model_dir.exists():
+            local_model_dir = Path("./models").resolve()
+
+        # Verify config.json exists directly inside the models folder
+        if (local_model_dir / "config.json").exists():
+            self.model_name: str = local_model_dir.as_posix()
+            logger.info(f"Found valid local model at '{self.model_name}'")
         else:
             self.model_name: str = settings.EMBEDDING_MODEL_NAME
+            logger.info(f"Local model not found. Defaulting to settings: '{self.model_name}'")
 
         # Automatically detect device
         self.device: str = "cuda" if torch.cuda.is_available() else "cpu"
         logger.info(f"Loading embedding model '{self.model_name}' on device '{self.device}'...")
         
         try:
-            # Load model directly from local directory if present
+            # Load model directly from local directory
             self.model: SentenceTransformer = SentenceTransformer(
                 self.model_name, 
                 device=self.device
@@ -86,7 +91,6 @@ class BGEEmbedder:
         except Exception as e:
             logger.exception(f"Failed to load sentence transformer model '{self.model_name}': {str(e)}")
             raise RuntimeError(f"Embedding model initialization failed: {str(e)}") from e
-
     # def __init__(self) -> None:
     #     """
     #     Initializes the model on CPU or GPU device.
