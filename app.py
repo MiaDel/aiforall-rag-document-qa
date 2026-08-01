@@ -180,9 +180,8 @@ def get_current_llm_provider() -> str:
     """Safely retrieves the LLM provider name without triggering missing secrets warnings."""
     provider = None
 
-    # 1. Check if a local/container secrets file ACTUALLY exists before accessing st.secrets
-    secrets_path = Path(".streamlit/secrets.toml")
-    if secrets_path.exists():
+    # 1. ONLY access st.secrets if the secrets.toml file actually exists on disk
+    if Path(".streamlit/secrets.toml").exists():
         try:
             if "LLM_PROVIDER" in st.secrets:
                 provider = st.secrets["LLM_PROVIDER"]
@@ -208,7 +207,6 @@ def get_current_llm_provider() -> str:
         "openrouter": "OpenRouter",
     }
     return provider_map.get(provider.lower(), provider.title())
-
 
 def render_top_bar() -> None:
     """Renders the professional SaaS Top Bar."""
