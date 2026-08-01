@@ -15,24 +15,92 @@ Technologies:
 import os
 import streamlit as st
 from config.settings import settings
+from pathlib import Path
+
+
+# def get_current_llm_provider() -> str:
+#     """Retrieves the active LLM provider label dynamically."""
+#     provider = None
+
+#     # 1. Check Streamlit Secrets
+#     try:
+#         if "LLM_PROVIDER" in st.secrets:
+#             provider = st.secrets["LLM_PROVIDER"]
+#     except Exception:
+#         pass
+
+#     # 2. Check Environment Variables
+#     if not provider:
+#         provider = os.getenv("LLM_PROVIDER")
+
+#     # 3. Check Settings
+#     if not provider and hasattr(settings, "LLM_PROVIDER"):
+#         provider = settings.LLM_PROVIDER
+
+#     if not provider:
+#         return "Unknown"
+
+#     provider_map = {
+#         "groq": "Groq (Llama 3.3)",
+#         "openai": "OpenAI GPT-4o",
+#         "gemini": "Google Gemini",
+#         "ollama": "Llama3 Local",
+#         "openrouter": "OpenRouter",
+#     }
+#     return provider_map.get(provider.lower(), provider.title())
+
+
+# def get_current_llm_provider() -> str:
+#     """Safely retrieves the LLM provider name without throwing missing secrets warnings."""
+#     provider = None
+
+#     # 1. Check Streamlit secrets ONLY if secrets file exists
+#     try:
+#         # Avoid accessing st.secrets directly if no secrets file is loaded
+#         if hasattr(st, "secrets") and len(st.secrets) > 0 and "LLM_PROVIDER" in st.secrets:
+#             provider = st.secrets["LLM_PROVIDER"]
+#     except Exception:
+#         pass
+
+#     # 2. Check Environment Variables (Primary method on Docker / AWS ECS)
+#     if not provider:
+#         provider = os.getenv("LLM_PROVIDER")
+
+#     # 3. Check Settings fallback
+#     if not provider and hasattr(settings, "LLM_PROVIDER"):
+#         provider = settings.LLM_PROVIDER
+
+#     if not provider:
+#         return "Unknown"
+
+#     provider_map = {
+#         "groq": "Groq (Llama 3.3 70B)",
+#         "openai": "OpenAI (GPT-4o)",
+#         "gemini": "Google Gemini",
+#         "ollama": "Llama3 Local",
+#         "openrouter": "OpenRouter",
+#     }
+#     return provider_map.get(provider.lower(), provider.title())
 
 
 def get_current_llm_provider() -> str:
-    """Retrieves the active LLM provider label dynamically."""
+    """Safely retrieves the LLM provider name without triggering missing secrets warnings."""
     provider = None
 
-    # 1. Check Streamlit Secrets
-    try:
-        if "LLM_PROVIDER" in st.secrets:
-            provider = st.secrets["LLM_PROVIDER"]
-    except Exception:
-        pass
+    # 1. Check if a local/container secrets file ACTUALLY exists before accessing st.secrets
+    secrets_path = Path(".streamlit/secrets.toml")
+    if secrets_path.exists():
+        try:
+            if "LLM_PROVIDER" in st.secrets:
+                provider = st.secrets["LLM_PROVIDER"]
+        except Exception:
+            pass
 
-    # 2. Check Environment Variables
+    # 2. Check Environment Variables (Primary method on AWS ECS Docker container)
     if not provider:
         provider = os.getenv("LLM_PROVIDER")
 
-    # 3. Check Settings
+    # 3. Check Settings fallback
     if not provider and hasattr(settings, "LLM_PROVIDER"):
         provider = settings.LLM_PROVIDER
 
@@ -40,14 +108,13 @@ def get_current_llm_provider() -> str:
         return "Unknown"
 
     provider_map = {
-        "groq": "Groq (Llama 3.3)",
-        "openai": "OpenAI GPT-4o",
+        "groq": "Groq (Llama 3.3 70B)",
+        "openai": "OpenAI (GPT-4o)",
         "gemini": "Google Gemini",
         "ollama": "Llama3 Local",
         "openrouter": "OpenRouter",
     }
     return provider_map.get(provider.lower(), provider.title())
-
 
 def render_metrics() -> None:
     """Renders the three top metrics card dashboard widgets.

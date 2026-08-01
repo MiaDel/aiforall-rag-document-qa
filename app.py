@@ -110,40 +110,104 @@ def load_stylesheet() -> None:
 
 
 
-def get_current_llm_provider() -> str:
-    """Safely retrieves the LLM provider name from st.secrets, env vars, or settings."""
-    provider = None
+# def get_current_llm_provider() -> str:
+#     """Safely retrieves the LLM provider name from st.secrets, env vars, or settings."""
+#     provider = None
     
-    # 1. Try reading from Streamlit Secrets (st.secrets)
-    try:
-        if "LLM_PROVIDER" in st.secrets:
-            provider = st.secrets["LLM_PROVIDER"]
-    except Exception:
-        pass
+#     # 1. Try reading from Streamlit Secrets (st.secrets)
+#     try:
+#         if "LLM_PROVIDER" in st.secrets:
+#             provider = st.secrets["LLM_PROVIDER"]
+#     except Exception:
+#         pass
         
-    # 2. Try reading from environment variables (.env / os.environ)
+#     # 2. Try reading from environment variables (.env / os.environ)
+#     if not provider:
+#         provider = os.getenv("LLM_PROVIDER")
+        
+#     # 3. Try reading from your settings module fallback
+#     if not provider and hasattr(settings, "LLM_PROVIDER"):
+#         provider = settings.LLM_PROVIDER
+
+#     if not provider:
+#         return "Unknown Provider"
+
+#     # Map raw key strings to user-friendly UI labels
+#     provider_labels = {
+#         "groq": "Groq (Llama 3.3 70B)",
+#         "openai": "OpenAI (GPT-4o)",
+#         "gemini": "Google Gemini",
+#         "ollama": "Llama3 Local",
+#         "openrouter": "OpenRouter",
+#     }
+    
+#     return provider_labels.get(provider.lower(), provider.title())
+
+# def get_current_llm_provider() -> str:
+#     """Safely retrieves the LLM provider name without throwing missing secrets warnings."""
+#     provider = None
+
+#     # 1. Check Streamlit secrets ONLY if secrets file exists
+#     try:
+#         # Avoid accessing st.secrets directly if no secrets file is loaded
+#         if hasattr(st, "secrets") and len(st.secrets) > 0 and "LLM_PROVIDER" in st.secrets:
+#             provider = st.secrets["LLM_PROVIDER"]
+#     except Exception:
+#         pass
+
+#     # 2. Check Environment Variables (Primary method on Docker / AWS ECS)
+#     if not provider:
+#         provider = os.getenv("LLM_PROVIDER")
+
+#     # 3. Check Settings fallback
+#     if not provider and hasattr(settings, "LLM_PROVIDER"):
+#         provider = settings.LLM_PROVIDER
+
+#     if not provider:
+#         return "Unknown"
+
+#     provider_map = {
+#         "groq": "Groq (Llama 3.3 70B)",
+#         "openai": "OpenAI (GPT-4o)",
+#         "gemini": "Google Gemini",
+#         "ollama": "Llama3 Local",
+#         "openrouter": "OpenRouter",
+#     }
+#     return provider_map.get(provider.lower(), provider.title())
+
+
+def get_current_llm_provider() -> str:
+    """Safely retrieves the LLM provider name without triggering missing secrets warnings."""
+    provider = None
+
+    # 1. Check if a local/container secrets file ACTUALLY exists before accessing st.secrets
+    secrets_path = Path(".streamlit/secrets.toml")
+    if secrets_path.exists():
+        try:
+            if "LLM_PROVIDER" in st.secrets:
+                provider = st.secrets["LLM_PROVIDER"]
+        except Exception:
+            pass
+
+    # 2. Check Environment Variables (Primary method on AWS ECS Docker container)
     if not provider:
         provider = os.getenv("LLM_PROVIDER")
-        
-    # 3. Try reading from your settings module fallback
+
+    # 3. Check Settings fallback
     if not provider and hasattr(settings, "LLM_PROVIDER"):
         provider = settings.LLM_PROVIDER
 
     if not provider:
-        return "Unknown Provider"
+        return "Unknown"
 
-    # Map raw key strings to user-friendly UI labels
-    provider_labels = {
+    provider_map = {
         "groq": "Groq (Llama 3.3 70B)",
         "openai": "OpenAI (GPT-4o)",
         "gemini": "Google Gemini",
         "ollama": "Llama3 Local",
         "openrouter": "OpenRouter",
     }
-    
-    return provider_labels.get(provider.lower(), provider.title())
-
-
+    return provider_map.get(provider.lower(), provider.title())
 
 
 def render_top_bar() -> None:
