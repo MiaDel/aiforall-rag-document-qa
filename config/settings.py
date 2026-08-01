@@ -35,16 +35,20 @@ logging.getLogger("sentence_transformers").setLevel(logging.WARNING)
 logging.getLogger("chromadb").setLevel(logging.WARNING)
 
 
+# def get_secret_or_env(key: str, default: str = "") -> str:
+#     """Helper to retrieve configuration value.
+#     First checks Streamlit secrets, then checks environment variables/defaults.
+#     """
+#     try:
+#         import streamlit as st
+#         if hasattr(st, "secrets") and key in st.secrets:
+#             return str(st.secrets[key])
+#     except Exception:
+#         pass
+#     return os.getenv(key, default)
+
 def get_secret_or_env(key: str, default: str = "") -> str:
-    """Helper to retrieve configuration value.
-    First checks Streamlit secrets, then checks environment variables/defaults.
-    """
-    try:
-        import streamlit as st
-        if hasattr(st, "secrets") and key in st.secrets:
-            return str(st.secrets[key])
-    except Exception:
-        pass
+    """Helper to retrieve configuration value directly from environment variables."""
     return os.getenv(key, default)
 
 
