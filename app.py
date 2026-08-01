@@ -15,16 +15,11 @@ Technologies:
 """
 
 import sys
+import os
 import logging
 import streamlit as st
 from pathlib import Path
-
-
-
 from config.settings import settings
-
-
-
 from ui.components.sidebar import render_sidebar
 
 # Page Specific Views
@@ -41,8 +36,6 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
-# st.set_page_config(page_title="RAG Assistant", layout="wide")
-
 
 # Triggers auto-build on first run; cached after that
 chroma_manager = get_chroma_manager()
@@ -116,12 +109,49 @@ def load_stylesheet() -> None:
         logger.warning(f"Theme stylesheet not found at {css_file}")
 
 
+
+def get_current_llm_provider() -> str:
+    """Safely retrieves the LLM provider name from st.secrets, env vars, or settings."""
+    provider = None
+    
+    # 1. Try reading from Streamlit Secrets (st.secrets)
+    try:
+        if "LLM_PROVIDER" in st.secrets:
+            provider = st.secrets["LLM_PROVIDER"]
+    except Exception:
+        pass
+        
+    # 2. Try reading from environment variables (.env / os.environ)
+    if not provider:
+        provider = os.getenv("LLM_PROVIDER")
+        
+    # 3. Try reading from your settings module fallback
+    if not provider and hasattr(settings, "LLM_PROVIDER"):
+        provider = settings.LLM_PROVIDER
+
+    if not provider:
+        return "Unknown Provider"
+
+    # Map raw key strings to user-friendly UI labels
+    provider_labels = {
+        "groq": "Groq (Llama 3.3 70B)",
+        "openai": "OpenAI (GPT-4o)",
+        "gemini": "Google Gemini",
+        "ollama": "Llama3 Local",
+        "openrouter": "OpenRouter",
+    }
+    
+    return provider_labels.get(provider.lower(), provider.title())
+
+
+
+
 def render_top_bar() -> None:
     """Renders the professional SaaS Top Bar."""
-    # Top Bar Columns
-    col_logo, col_space, col_model, col_theme, col_avatar = st.columns([5, 2, 2, 1, 1])
+    col_logo, col_space, col_model, col_theme = st.columns([4, 1, 3.5, 1.5])
     
-    # Initialize theme if not in session state
+    current_provider_label = get_current_llm_provider()
+    
     if "theme" not in st.session_state:
         st.session_state["theme"] = "dark"
         
@@ -138,9 +168,9 @@ def render_top_bar() -> None:
         
     with col_model:
         st.markdown(
-            '<div style="text-align: right; margin-top: 12px;">'
-            '  <span class="model-badge">🟢 Llama3 Local</span>'
-            '</div>',
+            f'<div style="text-align: right; margin-top: 12px;">'
+            f'  <span class="model-badge">🟢 {current_provider_label}</span>'
+            f'</div>',
             unsafe_allow_html=True
         )
         
@@ -150,17 +180,12 @@ def render_top_bar() -> None:
             st.session_state["theme"] = "light" if st.session_state["theme"] == "dark" else "dark"
             st.rerun()
             
-    with col_avatar:
-        st.markdown(
-            '<div style="display: flex; justify-content: center; margin-top: 8px;">'
-            '  <div class="user-avatar">KR</div>'
-            '</div>',
-            unsafe_allow_html=True
-        )
-
+    
 
 def run_about_page() -> None:
     """Renders the About multi-document chatbot info page."""
+    current_provider_label = get_current_llm_provider()
+    
     st.markdown('<h2 style="margin-bottom:8px;">❓ About Loan RAG Chatbot</h2>', unsafe_allow_html=True)
     st.write("Browse architecture descriptions and technical details.")
 
@@ -175,12 +200,11 @@ def run_about_page() -> None:
         '    <li><b>Semantic Chunking:</b> Segments documents at semantic shifts using embedding distance shifts.</li>'
         '    <li><b>Hybrid Search:</b> Connects dense vector search (ChromaDB) with lexical keyword matching (BM25).</li>'
         '    <li><b>Cross-Encoder:</b> MS-Marco MiniLM model reranks retrieved passages.</li>'
-        '    <li><b>Llama3 Local:</b> Synthesizes context to generate accurate, citation-anchored answers.</li>'
+        f'    <li><b>{current_provider_label}:</b> Synthesizes context to generate accurate, citation-anchored answers.</li>'
         '  </ul>'
         '</div>',
         unsafe_allow_html=True
     )
-
 
 # Initialize session state variables
 if "theme" not in st.session_state:

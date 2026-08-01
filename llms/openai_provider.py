@@ -16,42 +16,27 @@ class OpenAIProvider:
     Client wrapper for OpenAI API completions.
     """
 
-    def __init__(self):
-        self.api_key = settings.OPENAI_API_KEY
-        self.model = settings.OPENAI_MODEL
-
     def generate(self, prompt: str, system_prompt: str = "", timeout: float = 12.0) -> Dict[str, Any]:
         """
         Sends generation request to OpenAI API.
-
-        Parameters:
-            prompt: User message context.
-            system_prompt: System instruction prompt.
-            timeout: Maximum seconds to wait.
-
-        Returns:
-            Dict matching response schema:
-            {
-                "answer": str,
-                "provider": "openai",
-                "tokens_used": int,
-                "success": bool,
-                "error": str | None
-            }
         """
-        if not self.api_key:
+        # Read dynamically on every call so updated settings/secrets are immediately recognized
+        api_key = settings.OPENAI_API_KEY
+        model = settings.OPENAI_MODEL or "gpt-4o-mini"
+
+        if not api_key:
             logger.error("OpenAI API key is missing.")
             return {
                 "answer": "",
                 "provider": "openai",
                 "tokens_used": 0,
                 "success": False,
-                "error": "OpenAI API key is not configured in environment variables."
+                "error": "OpenAI API key is not configured in environment variables or secrets."
             }
 
-        logger.info(f"Sending prompt to OpenAI API ({self.model})...")
+        logger.info(f"Sending prompt to OpenAI API ({model})...")
         try:
-            client = OpenAI(api_key=self.api_key)
+            client = OpenAI(api_key=api_key)
             
             messages = []
             if system_prompt:
@@ -60,7 +45,7 @@ class OpenAIProvider:
 
             completion = client.chat.completions.create(
                 messages=messages,
-                model=self.model,
+                model=model,
                 temperature=0.2,
                 timeout=timeout
             )

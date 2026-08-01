@@ -1,45 +1,7 @@
-"""
-=========================================================
-File Name : settings.py
-Project   : Multi-Document RAG Chatbot
-Author    : Kaif Rehman
-Description:
-Configuration module for loading and validating system environment variables.
-Applies environment setup rules for HuggingFace caching, telemetry,
-and offline execution switches. Integrates Streamlit Secrets checks
-falling back to local environment variables or defaults.
-
-Technologies:
-- Python standard os/pathlib libraries
-- python-dotenv
-- Streamlit secrets interface
-=========================================================
-"""
-
 import os
 import logging
 from pathlib import Path
 from dotenv import load_dotenv
-
-# Suppress Hugging Face symlink warnings on Windows
-os.environ["HF_HUB_DISABLE_SYMLINKS_WARNING"] = "1"
-
-# 1. Pinned HuggingFace Environment settings
-os.environ["HF_HOME"] = "models"
-os.environ["HF_HUB_DISABLE_TELEMETRY"] = "1"
-os.environ["HF_HUB_ENABLE_HF_TRANSFER"] = "1"
-
-# Automatically enable offline execution once local models are present
-if Path("./models/hub").exists() or Path("./models/models--BAAI--bge-large-en-v1.5").exists():
-    os.environ["TRANSFORMERS_OFFLINE"] = "1"
-    os.environ["HF_HUB_OFFLINE"] = "1"
-
-# 2. Setup standard logging limits to reduce terminal clutter noise
-logging.getLogger("httpx").setLevel(logging.ERROR)
-logging.getLogger("urllib3").setLevel(logging.ERROR)
-logging.getLogger("huggingface_hub").setLevel(logging.ERROR)
-logging.getLogger("sentence_transformers").setLevel(logging.WARNING)
-logging.getLogger("chromadb").setLevel(logging.WARNING)
 
 # Automatically load the .env file if it exists
 load_dotenv()
@@ -56,6 +18,22 @@ UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
 PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
 CHROMA_PERSIST_DIR.mkdir(parents=True, exist_ok=True)
 
+# HuggingFace Environment settings
+os.environ["HF_HUB_DISABLE_SYMLINKS_WARNING"] = "1"
+os.environ["HF_HUB_DISABLE_TELEMETRY"] = "1"
+os.environ["HF_HUB_ENABLE_HF_TRANSFER"] = "1"
+
+# Explicitly ensure offline flags are cleared in runtime
+os.environ.pop("TRANSFORMERS_OFFLINE", None)
+os.environ.pop("HF_HUB_OFFLINE", None)
+
+# 2. Setup standard logging limits to reduce terminal clutter noise
+logging.getLogger("httpx").setLevel(logging.ERROR)
+logging.getLogger("urllib3").setLevel(logging.ERROR)
+logging.getLogger("huggingface_hub").setLevel(logging.ERROR)
+logging.getLogger("sentence_transformers").setLevel(logging.WARNING)
+logging.getLogger("chromadb").setLevel(logging.WARNING)
+
 
 def get_secret_or_env(key: str, default: str = "") -> str:
     """Helper to retrieve configuration value.
@@ -71,14 +49,7 @@ def get_secret_or_env(key: str, default: str = "") -> str:
 
 
 class Settings:
-    """Application configurations. Loads values from environment variables or applies defaults.
-
-    Responsibilities:
-    1. Parse system log levels.
-    2. Maintain database connection parameters.
-    3. Maintain chunk size settings.
-    4. Maintain api key credentials.
-    """
+    """Application configurations. Loads values from environment variables or applies defaults."""
     # System settings
     LOG_LEVEL: str = get_secret_or_env("LOG_LEVEL", "INFO")
     CHROMA_PERSIST_DIRECTORY: str = get_secret_or_env("CHROMA_PERSIST_DIRECTORY", str(CHROMA_PERSIST_DIR.resolve()))
@@ -97,6 +68,7 @@ class Settings:
     RERANKER_MODEL_NAME: str = get_secret_or_env("RERANKER_MODEL_NAME", "cross-encoder/ms-marco-MiniLM-L-6-v2")
 
     # LLM Provider settings
+    LLM_PROVIDER: str = get_secret_or_env("LLM_PROVIDER", "openai")
     OLLAMA_HOST: str = get_secret_or_env("OLLAMA_HOST", "http://127.0.0.1:11434")
     OLLAMA_MODEL: str = get_secret_or_env("OLLAMA_MODEL", "llama3")
     GEMINI_API_KEY: str = get_secret_or_env("GEMINI_API_KEY", "")
