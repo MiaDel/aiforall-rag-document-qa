@@ -83,23 +83,45 @@ from pathlib import Path
 #     return provider_map.get(provider.lower(), provider.title())
 
 
+# def get_current_llm_provider() -> str:
+#     """Safely retrieves the LLM provider name without triggering missing secrets warnings."""
+#     provider = None
+
+#     # 1. ONLY access st.secrets if the secrets.toml file actually exists on disk
+#     if Path(".streamlit/secrets.toml").exists():
+#         try:
+#             if "LLM_PROVIDER" in st.secrets:
+#                 provider = st.secrets["LLM_PROVIDER"]
+#         except Exception:
+#             pass
+
+#     # 2. Check Environment Variables (Primary method on AWS ECS Docker container)
+#     if not provider:
+#         provider = os.getenv("LLM_PROVIDER")
+
+#     # 3. Check Settings fallback
+#     if not provider and hasattr(settings, "LLM_PROVIDER"):
+#         provider = settings.LLM_PROVIDER
+
+#     if not provider:
+#         return "Unknown"
+
+#     provider_map = {
+#         "groq": "Groq (Llama 3.3 70B)",
+#         "openai": "OpenAI (GPT-4o)",
+#         "gemini": "Google Gemini",
+#         "ollama": "Llama3 Local",
+#         "openrouter": "OpenRouter",
+#     }
+#     return provider_map.get(provider.lower(), provider.title())
+
+
 def get_current_llm_provider() -> str:
-    """Safely retrieves the LLM provider name without triggering missing secrets warnings."""
-    provider = None
+    """Retrieves the active LLM provider directly from environment variables/settings."""
+    # 1. Read directly from environment variable (set in ECS / Docker)
+    provider = os.getenv("LLM_PROVIDER")
 
-    # 1. ONLY access st.secrets if the secrets.toml file actually exists on disk
-    if Path(".streamlit/secrets.toml").exists():
-        try:
-            if "LLM_PROVIDER" in st.secrets:
-                provider = st.secrets["LLM_PROVIDER"]
-        except Exception:
-            pass
-
-    # 2. Check Environment Variables (Primary method on AWS ECS Docker container)
-    if not provider:
-        provider = os.getenv("LLM_PROVIDER")
-
-    # 3. Check Settings fallback
+    # 2. Fall back to settings module
     if not provider and hasattr(settings, "LLM_PROVIDER"):
         provider = settings.LLM_PROVIDER
 
@@ -113,8 +135,7 @@ def get_current_llm_provider() -> str:
         "ollama": "Llama3 Local",
         "openrouter": "OpenRouter",
     }
-    return provider_map.get(provider.lower(), provider.title())
-
+    return provider_map.get(str(provider).lower(), str(provider).title())
 
 def render_metrics() -> None:
     """Renders the three top metrics card dashboard widgets.

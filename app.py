@@ -22,13 +22,6 @@ from pathlib import Path
 from config.settings import settings
 from ui.components.sidebar import render_sidebar
 
-# Page Specific Views
-from ui.pages.chat_assistant import run_chat_assistant_page
-from ui.pages.upload import run_upload_page
-from ui.pages.document_viewer import run_document_viewer_page
-from ui.pages.settings import run_settings_page
-from utils.resource_manager import get_chroma_manager
-
 # Page Configuration
 st.set_page_config(
     page_title="Multi-Document RAG Chatbot",
@@ -36,6 +29,15 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
+# Page Specific Views
+from ui.pages.chat_assistant import run_chat_assistant_page
+from ui.pages.upload import run_upload_page
+from ui.pages.document_viewer import run_document_viewer_page
+from ui.pages.settings import run_settings_page
+from utils.resource_manager import get_chroma_manager
+
+
 
 # Triggers auto-build on first run; cached after that
 chroma_manager = get_chroma_manager()
@@ -176,23 +178,44 @@ def load_stylesheet() -> None:
 #     return provider_map.get(provider.lower(), provider.title())
 
 
+# def get_current_llm_provider() -> str:
+#     """Safely retrieves the LLM provider name without triggering missing secrets warnings."""
+#     provider = None
+
+#     # 1. ONLY access st.secrets if the secrets.toml file actually exists on disk
+#     if Path(".streamlit/secrets.toml").exists():
+#         try:
+#             if "LLM_PROVIDER" in st.secrets:
+#                 provider = st.secrets["LLM_PROVIDER"]
+#         except Exception:
+#             pass
+
+#     # 2. Check Environment Variables (Primary method on AWS ECS Docker container)
+#     if not provider:
+#         provider = os.getenv("LLM_PROVIDER")
+
+#     # 3. Check Settings fallback
+#     if not provider and hasattr(settings, "LLM_PROVIDER"):
+#         provider = settings.LLM_PROVIDER
+
+#     if not provider:
+#         return "Unknown"
+
+#     provider_map = {
+#         "groq": "Groq (Llama 3.3 70B)",
+#         "openai": "OpenAI (GPT-4o)",
+#         "gemini": "Google Gemini",
+#         "ollama": "Llama3 Local",
+#         "openrouter": "OpenRouter",
+#     }
+#     return provider_map.get(provider.lower(), provider.title())
+
 def get_current_llm_provider() -> str:
-    """Safely retrieves the LLM provider name without triggering missing secrets warnings."""
-    provider = None
+    """Retrieves the active LLM provider directly from environment variables/settings."""
+    # 1. Read directly from environment variable (set in ECS / Docker)
+    provider = os.getenv("LLM_PROVIDER")
 
-    # 1. ONLY access st.secrets if the secrets.toml file actually exists on disk
-    if Path(".streamlit/secrets.toml").exists():
-        try:
-            if "LLM_PROVIDER" in st.secrets:
-                provider = st.secrets["LLM_PROVIDER"]
-        except Exception:
-            pass
-
-    # 2. Check Environment Variables (Primary method on AWS ECS Docker container)
-    if not provider:
-        provider = os.getenv("LLM_PROVIDER")
-
-    # 3. Check Settings fallback
+    # 2. Fall back to settings module
     if not provider and hasattr(settings, "LLM_PROVIDER"):
         provider = settings.LLM_PROVIDER
 
@@ -206,7 +229,7 @@ def get_current_llm_provider() -> str:
         "ollama": "Llama3 Local",
         "openrouter": "OpenRouter",
     }
-    return provider_map.get(provider.lower(), provider.title())
+    return provider_map.get(str(provider).lower(), str(provider).title())
 
 def render_top_bar() -> None:
     """Renders the professional SaaS Top Bar."""
