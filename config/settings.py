@@ -77,7 +77,7 @@ class Settings:
     OLLAMA_MODEL: str = get_secret_or_env("OLLAMA_MODEL", "llama3")
     GEMINI_API_KEY: str = get_secret_or_env("GEMINI_API_KEY", "")
     GROQ_API_KEY: str = get_secret_or_env("GROQ_API_KEY", "")
-    GROQ_MODEL: str = get_secret_or_env("GROQ_MODEL", "llama3-70b-8192")
+    GROQ_MODEL: str = get_secret_or_env("GROQ_MODEL", "llama-3.3-70b-versatile")
     OPENAI_API_KEY: str = get_secret_or_env("OPENAI_API_KEY", "")
     OPENAI_MODEL: str = get_secret_or_env("OPENAI_MODEL", "gpt-4o-mini")
 
